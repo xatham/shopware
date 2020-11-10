@@ -46,6 +46,11 @@ class Shopware_Components_StringCompiler
     protected $context = [];
 
     /**
+     * @var array
+     */
+    private $templateCache = [];
+
+    /**
      * @param array $context
      */
     public function __construct(\Enlight_Template_Manager $view, $context = null)
@@ -162,9 +167,16 @@ class Shopware_Components_StringCompiler
         $templateEngine = $this->getView();
 
         try {
-            $template = $templateEngine->createTemplate('string:' . $value);
-            $template->assign($context);
-            $template = $template->fetch();
+            $cacheKey = md5($value);
+
+            if (!isset($this->templateCache[$cacheKey])) {
+                $this->templateCache[$cacheKey] = $templateEngine->createTemplate('string:' . $value);
+            }
+
+            $this->templateCache[$cacheKey]->clearAllAssign();
+
+            $this->templateCache[$cacheKey]->assign($context);
+            $template = $this->templateCache[$cacheKey]->fetch();
         } catch (SmartyCompilerException $e) {
             $errorMessage = $e->getMessage();
 
