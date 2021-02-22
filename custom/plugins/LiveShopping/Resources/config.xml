@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.3/engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+        <element type="text" scope="locale">
+            <name>swagSloganContent</name>
+            <label lang="de">Slogan</label>
+            <label lang="en">Your slogan</label>
+            <description lang="de">Dieser Slogan wird in in der Storefront angezeigt</description>
+            <description lang="en">This slogan will be shown on the storefront</description>
+        </element>
+        <element type="text" scope="locale">
+            <name>liveShoppingArticleId</name>
+            <label lang="de">Artikel-ID</label>
+            <label lang="en">Article id</label>
+            <description lang="de">Die Artikel-ID für das Angebot</description>
+            <description lang="en">The article id for the offer</description>
+        </element>
+
+        <element type="text" scope="locale">
+            <name>liveShoppingActive</name>
+            <label lang="de">Aktiv</label>
+            <label lang="en">Active</label>
+            <description lang="de">Live Shopping aktiv</description>
+            <description lang="en">Live shopping active</description>
+        </element>
+
+        <element type="date" scope="locale">
+            <name>liveShoppingStartDate</name>
+            <label lang="de">Startdatum</label>
+            <label lang="en">Start date</label>
+            <description lang="de">Startdatum - Ab wann das Angebot gilt</description>
+            <description lang="en">Start date - When the offers price starts</description>
+        </element>
+
+        <element type="date" scope="locale">
+            <name>liveShoppingEndDate</name>
+            <label lang="de">Enddatum</label>
+            <label lang="en">End date</label>
+            <description lang="de">Zeipunkt ab dem das Angebot abgeschaltet wird</description>
+            <description lang="en">Date when offer expires</description>
+        </element>
+
+        <element type="select" scope="locale">
+            <name>swagSloganFontSize</name>
+            <label lang="de">Schriftgröße</label>
+            <label lang="en">Font size</label>
+            <value>12</value>
+            <store>
+                <option>
+                    <value>12</value>
+                    <label>12px</label>
+                </option>
+                <option>
+                    <value>18</value>
+                    <label>18px</label>
+                </option>
+                <option>
+                    <value>24</value>
+                    <label>24px</label>
+                </option>
+            </store>
+        </element>
+        <element type="boolean" scope="locale">
+            <name>swagSloganItalic</name>
+            <label lang="de">Kursiv</label>
+            <label lang="en">Italic</label>
+            <value>false</value>
+        </element>
+    </elements>
+</config>

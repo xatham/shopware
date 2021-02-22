@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="live_shopping.emotion_view_subscriber" class="Shopware\Components\Emotion\EmotionComponentViewSubscriber">
+            <argument>%live_shopping.plugin_dir%</argument>
+            <tag name="shopware.event_subscriber" />
+        </service>
+
+        <service id="live_shopping.live_shopping_printer" class="LiveShopping\Components\LiveShoppingPrinter">
+        </service>
+        <service id="live_shopping.subscriber.route" class="LiveShopping\Subscriber\RouteSubscriber">
+            <argument>%live_shopping.plugin_name%</argument>
+            <argument>%live_shopping.plugin_dir%</argument>
+            <argument type="service" id="live_shopping.live_shopping_printer"/>
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+
+        <service id="live_shopping.seo_category_service"
+                 class="LiveShopping\Components\Service\SeoCategoryService">
+            <argument type="service" id="dbal_connection"/>
+            <argument type="service" id="shopware_storefront.category_service"/>
+        </service>
+
+        <service id="live_shopping.components.service.list_product_service"
+                 class="LiveShopping\Components\Service\ListProductService"
+                 decorates="shopware_storefront.list_product_service">
+            <argument type="service" id="live_shopping.components.service.list_product_service.inner" />
+            <argument type="service" id="live_shopping.seo_category_service" />
+        </service>
+        <service id="live_shopping.emotion.preset_live_shopping_handler" class="LiveShopping\Components\ComponentHandler\LiveShoppingHandler">
+            <argument type="service" id="shopware_media.media_service"/>
+            <argument type="service" id="shopware.api.media"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.emotion.preset_component_handler" />
+        </service>
+    </services>
+
+</container>
