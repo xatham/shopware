@@ -290,6 +290,7 @@ class Zend_Cache_Core
         self::_validateIdOrTag($id);
 
         $this->_log("Zend_Cache_Core: load item '{$id}'", 7);
+
         $data = $this->_backend->load($id, $doNotTestCacheValidity);
         if ($data === false) {
             // no cache available

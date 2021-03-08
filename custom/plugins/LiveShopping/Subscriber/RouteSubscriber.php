@@ -27,9 +27,7 @@ declare(strict_types=1);
 namespace LiveShopping\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
-use Shopware\Components\Emotion\ComponentInstaller;
 use Shopware\Components\Plugin\ConfigReader;
-use Shopware\Recovery\Common\DependencyInjection\ContainerInterface;
 
 class RouteSubscriber implements SubscriberInterface
 {
@@ -63,13 +61,17 @@ class RouteSubscriber implements SubscriberInterface
             $view->assign('swagSloganContent', $this->sloganPrinter->getSlogan());
         }
         $view->assign('slogan', $this->sloganPrinter->getSlogan());
+        $view->assign('liveShopping', [
+                'liveShoppingActive' => $this->config['liveShoppingActive'],
+                'liveShoppingArticleId' => $this->config['liveShoppingArticleId'],
+            ]
+        );
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             'Enlight_Controller_Action_PostDispatchSecure' => 'onPostDispatch',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Emotion' => 'onPostDispatch',
         ];
     }
 }

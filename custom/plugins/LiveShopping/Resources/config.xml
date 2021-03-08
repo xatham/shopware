@@ -17,12 +17,20 @@
             <description lang="en">The article id for the offer</description>
         </element>
 
-        <element type="text" scope="locale">
+        <element type="boolean" scope="locale">
             <name>liveShoppingActive</name>
             <label lang="de">Aktiv</label>
             <label lang="en">Active</label>
             <description lang="de">Live Shopping aktiv</description>
             <description lang="en">Live shopping active</description>
+        </element>
+
+        <element required="true" type="text" scope="locale">
+            <name>liveShoppingReduction</name>
+            <label lang="de">Preisreduzierung in Prozent</label>
+            <label lang="en">Price reduction in percent</label>
+            <description lang="de">Um wieviel das Produkt reduziert werden soll</description>
+            <description lang="en">How much the live offer shop reduce the price</description>
         </element>
 
         <element type="date" scope="locale">

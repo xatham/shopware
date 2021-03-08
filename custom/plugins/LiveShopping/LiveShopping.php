@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 namespace LiveShopping;
 
-use Shopware\Components\Emotion\ComponentInstaller;
+use LiveShopping\Bootstrap\Setup;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
@@ -38,9 +38,14 @@ class LiveShopping extends Plugin
     public function install(InstallContext $context)
     {
         parent::install($context);
+        $setup = new Setup(
+            $this->getName(),
+            $this->container->get('db_connection'),
+            $this->container->get(ModelManager::class),
+            $this->container->get('shopware.emotion_component_installer')
+        );
 
-        /** @var ComponentInstaller $componentInstaller */
-        $componentInstaller = $this->container->get('shopware.emotion_component_installer');
+        /*$componentInstaller = $this->container->get('shopware.emotion_component_installer');
         $liveShoppingElement = $componentInstaller->createOrUpdate(
             $this->getName(),
             'LiveShoppingEmotion',
@@ -84,6 +89,11 @@ class LiveShopping extends Plugin
         $em = $this->container->get(ModelManager::class);
         $em->persist($liveShoppingElement);
         $em->flush();
+
+        $setup = new Setup(
+            $this->container->get('dbal_connection')
+        );*/
+        $setup->install();
     }
 
     public function uninstall(UninstallContext $context)
@@ -94,11 +104,23 @@ class LiveShopping extends Plugin
         $pluginRepo = $em->getRepository(\Shopware\Models\Plugin\Plugin::class);
         /** @var Plugin|null $plugin */
         $plugin = $pluginRepo->findOneBy(['name' => $this->getName()]);
+
         $component = $repo->findOneBy([
             'pluginId' => $plugin->getId(),
         ]);
-        $em->remove($component);
-        $em->flush();
+        if ($component !== null) {
+            $em->remove($component);
+            $em->flush();
+        }
+
+        $setup = new Setup(
+            $this->getName(),
+            $this->container->get('db_connection'),
+            $this->container->get(ModelManager::class),
+            $this->container->get('shopware.emotion_component_installer')
+        );
+
+        $setup->uninstall();
 
         parent::uninstall($context);
     }
