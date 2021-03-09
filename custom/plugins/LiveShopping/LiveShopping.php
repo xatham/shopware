@@ -26,100 +26,37 @@ declare(strict_types=1);
 
 namespace LiveShopping;
 
+use Doctrine\ORM\Tools\SchemaTool;
 use LiveShopping\Bootstrap\Setup;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
-use Shopware\Models\Emotion\Library\Component;
 
 class LiveShopping extends Plugin
 {
     public function install(InstallContext $context)
     {
-        parent::install($context);
         $setup = new Setup(
             $this->getName(),
             $this->container->get('db_connection'),
             $this->container->get(ModelManager::class),
-            $this->container->get('shopware.emotion_component_installer')
+            $this->container->get('shopware.emotion_component_installer'),
+            new SchemaTool($this->container->get('models')),
         );
-
-        /*$componentInstaller = $this->container->get('shopware.emotion_component_installer');
-        $liveShoppingElement = $componentInstaller->createOrUpdate(
-            $this->getName(),
-            'LiveShoppingEmotion',
-            [
-                'name' => 'Live Shopping',
-                'template' => 'component_live_shopping',
-                'cls' => 'live-shopping-element',
-                'description' => 'A simple live shopping element for the shopping worlds.',
-            ]
-        );
-        $liveShoppingElement->createTextField([
-            'name' => 'live_shopping_article_id',
-            'fieldLabel' => 'Article id',
-            'supportText' => 'Enter the ID of the article you want to promote.',
-            'allowBlank' => false,
-        ]);
-
-        $liveShoppingElement->createHiddenField([
-            'name' => 'live_shopping_thumbnail',
-        ]);
-
-        $liveShoppingElement->createCheckboxField([
-            'name' => 'live_shopping_active',
-            'fieldLabel' => 'Live shopping active',
-            'defaultValue' => false,
-        ]);
-
-        $liveShoppingElement->createDateField([
-            'name' => 'live_shopping_start_date',
-            'fieldLabel' => 'Start date',
-            'defaultValue' => false,
-            'allowBlank' => false,
-        ]);
-
-        $liveShoppingElement->createDateField([
-            'name' => 'live_shopping_end_date',
-            'fieldLabel' => 'End date',
-            'defaultValue' => false,
-        ]);
-
-        $em = $this->container->get(ModelManager::class);
-        $em->persist($liveShoppingElement);
-        $em->flush();
-
-        $setup = new Setup(
-            $this->container->get('dbal_connection')
-        );*/
         $setup->install();
+        parent::install($context);
     }
 
     public function uninstall(UninstallContext $context)
     {
-        /** @var ModelManager $em */
-        $em = $this->container->get(ModelManager::class);
-        $repo = $em->getRepository(Component::class);
-        $pluginRepo = $em->getRepository(\Shopware\Models\Plugin\Plugin::class);
-        /** @var Plugin|null $plugin */
-        $plugin = $pluginRepo->findOneBy(['name' => $this->getName()]);
-
-        $component = $repo->findOneBy([
-            'pluginId' => $plugin->getId(),
-        ]);
-        if ($component !== null) {
-            $em->remove($component);
-            $em->flush();
-        }
-
         $setup = new Setup(
             $this->getName(),
             $this->container->get('db_connection'),
             $this->container->get(ModelManager::class),
-            $this->container->get('shopware.emotion_component_installer')
+            $this->container->get('shopware.emotion_component_installer'),
+            new SchemaTool($this->container->get('models')),
         );
-
         $setup->uninstall();
 
         parent::uninstall($context);

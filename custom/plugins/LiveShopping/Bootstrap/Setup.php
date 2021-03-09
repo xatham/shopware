@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace LiveShopping\Bootstrap;
 
+use Doctrine\ORM\Tools\SchemaTool;
+use LiveShopping\Models\LiveShoppingItem;
 use PDO;
 use Shopware\Components\Emotion\ComponentInstaller;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Components\Plugin;
+use Shopware\Models\Emotion\Library\Component;
 
 final class Setup
 {
@@ -30,28 +34,66 @@ final class Setup
      */
     private $componentInstaller;
 
-    public function __construct(string $pluginName, PDO $connection, ModelManager $modelManager, ComponentInstaller $componentInstaller)
+    /**
+     * @var SchemaTool
+     */
+    private $schemaTool;
+
+    /**
+     * Setup constructor.
+     * @param string $pluginName
+     * @param PDO $connection
+     * @param ModelManager $modelManager
+     * @param ComponentInstaller $componentInstaller
+     * @param SchemaTool $schemaTool
+     */
+    public function __construct(string $pluginName, PDO $connection, ModelManager $modelManager, ComponentInstaller $componentInstaller, SchemaTool $schemaTool)
     {
         $this->pluginName = $pluginName;
         $this->connection = $connection;
         $this->modelManager = $modelManager;
         $this->componentInstaller = $componentInstaller;
+        $this->schemaTool = $schemaTool;
     }
 
     public function install(): void
     {
-        $this->createTable();
+        $classes = [
+            $this->modelManager->getClassMetadata(LiveShoppingItem::class),
+        ];
+        $this->schemaTool->createSchema($classes);
+        $this->createNewLiveShoppingEmotion();
     }
 
     public function uninstall(): void
     {
-        $this->connection->query('DROP TABLE IF EXISTS s_plugin_live_shopping_item');
+        $repo = $this->modelManager->getRepository(Component::class);
+        $pluginRepo = $this->modelManager->getRepository(\Shopware\Models\Plugin\Plugin::class);
+
+        /** @var Plugin|null $plugin */
+        $plugin = $pluginRepo->findOneBy(['name' => $this->pluginName]);
+        $component = null;
+        if ($plugin !== null) {
+            $component = $repo->findOneBy([
+                'pluginId' => $plugin->getId(),
+            ]);
+        }
+        if ($component !== null) {
+            $this->modelManager->remove($component);
+            $this->modelManager->flush();
+        }
+
+        $classes = [
+            $this->modelManager->getClassMetadata(LiveShoppingItem::class),
+        ];
+        $this->schemaTool->dropSchema($classes);
+
     }
 
     private function createNewLiveShoppingEmotion(): void
     {
         $liveShoppingElement = $this->componentInstaller->createOrUpdate(
-            $this->getName(),
+            $this->pluginName,
             'LiveShoppingEmotion',
             [
                 'name' => 'Live Shopping',
@@ -90,32 +132,7 @@ final class Setup
             'defaultValue' => false,
         ]);
 
-        $em = $this->modelManager->getRepository(ModelManager::class);
-        $em->persist($liveShoppingElement);
-        $em->flush();
-    }
-
-
-    private function createTable(): void
-    {
-        $createQuery = <<<SQL
-CREATE TABLE `s_plugin_live_shopping_item` (
-  `id` INT(11) UNSIGNED NOT NULL,
-  `article_id` INT(11) UNSIGNED NOT NULL,
-  `active` TINYINT(1) NOT NULL DEFAULT 0,
-  `start_date` DATETIME NOT NULL,
-  `end_date` DATETIME NOT NULL,
-  `saving_absolute` DECIMAL(6,2) NOT NULL,
-  `created` DATETIME NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_s_plugin_live_shopping_item_id_idx` (`article_id` ASC),
-  CONSTRAINT `fk_s_plugin_live_shopping_item_id`
-    FOREIGN KEY (`article_id`)
-    REFERENCES `shopware`.`s_articles` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION);
-
-SQL;
-        $this->connection->query($createQuery);
+        $this->modelManager->persist($liveShoppingElement);
+        $this->modelManager->flush();
     }
 }
