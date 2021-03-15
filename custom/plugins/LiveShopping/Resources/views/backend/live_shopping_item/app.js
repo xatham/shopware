@@ -10,7 +10,9 @@ Ext.define('Shopware.apps.LiveShoppingItem', {
 
     views: [
         'list.Window',
-        'list.LiveShoppingItem'
+        'list.LiveShoppingItem',
+        'detail.Window',
+        'detail.LiveShoppingItem',
     ],
 
     models: [ 'LiveShoppingItem' ],

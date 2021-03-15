@@ -28,13 +28,14 @@ namespace LiveShopping\Models;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Shopware\Models\Article\Article;
+use Shopware\Components\Model\ModelEntity;
+use Shopware\Models\Article\Detail;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="s_plugin_live_shopping_item")
  */
-class LiveShoppingItem
+class LiveShoppingItem extends ModelEntity
 {
     /**
      * @ORM\Id
@@ -46,11 +47,11 @@ class LiveShoppingItem
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=Article::class)
+     * @ORM\OneToOne(targetEntity=Detail::class)
      *
-     * @var int
+     * @var Detail
      */
-    private $articleId;
+    private $article;
 
     /**
      * @ORM\Column(type="boolean")
@@ -60,14 +61,14 @@ class LiveShoppingItem
     private $active;
 
     /**
-     * @ORM\Column(type="date_immutable", name="start_date")
+     * @ORM\Column(type="datetime_immutable", name="start_date")
      *
      * @var DateTimeImmutable
      */
     private $startDate;
 
     /**
-     * @ORM\Column(type="date_immutable", nullable=true, name="end_date")
+     * @ORM\Column(type="datetime_immutable", nullable=true, name="end_date")
      *
      * @var DateTimeImmutable
      */
@@ -92,14 +93,14 @@ class LiveShoppingItem
         return $this;
     }
 
-    public function getArticleId(): int
+    public function getArticle(): Detail
     {
-        return $this->articleId;
+        return $this->article;
     }
 
-    public function setArticleId(int $articleId): LiveShoppingItem
+    public function setArticle($article): LiveShoppingItem
     {
-        $this->articleId = $articleId;
+        $this->article = $article;
 
         return $this;
     }
